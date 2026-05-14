@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Happy Birthday, Friend! 🎂</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --pink: #f472b6;
+    --rose: #fb7185;
+    --violet: #a78bfa;
+    --gold: #fbbf24;
+    --cream: #fff8f0;
+    --dark: #0f0a1e;
+    --mid: #1e1535;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--dark);
+    color: white;
+    overflow-x: hidden;
+  }
+
+  /* ─── STARS CANVAS ─── */
+  #stars-canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* ─── SECTIONS ─── */
+  section {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+  }
+
+  /* ─── SURPRISE DOOR ─── */
+  #surprise-section {
+    background: linear-gradient(135deg, #0f0a1e 0%, #1a0a2e 50%, #0f0a1e 100%);
+  }
+
+  #door-wrap {
+    perspective: 900px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  #door {
+    width: 260px;
+    height: 360px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 1.2s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  #door.open { transform: rotateY(-170deg); }
+
+  .door-face {
+    position: absolute;
+    inset: 0;
+    border-radius: 130px 130px 8px 8px;
+    backface-visibility: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  .door-front {
+    background: linear-gradient(160deg, #7c3aed, #db2777);
+    border: 3px solid rgba(255,255,255,0.2);
+    box-shadow: 0 0 60px rgba(167,139,250,0.4), inset 0 0 40px rgba(0,0,0,0.2);
+  }
+
+  .door-back {
+    background: linear-gradient(160deg, #1e1535, #2d1b4e);
+    transform: rotateY(180deg);
+    border: 3px solid rgba(251,191,36,0.3);
+  }
+
+  .door-knocker {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 3px solid rgba(255,255,255,0.6);
+    background: rgba(255,255,255,0.15);
+  }
+
+  #door-hint {
+    margin-top: 2rem;
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse { 0%,100%{opacity:.4} 50%{opacity:1} }
+
+  /* ─── HERO / WISH SECTION ─── */
+  #hero-section {
+    background: radial-gradient(ellipse at 50% 0%, #2d1b4e 0%, #0f0a1e 70%);
+    display: none;
+  }
+
+  #hero-section.visible { display: flex; animation: fadeSlideUp 1s ease both; }
+
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .big-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3rem, 10vw, 7rem);
+    line-height: 1.05;
+    text-align: center;
+    background: linear-gradient(135deg, #f9a8d4, #c084fc, #fbbf24);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+  }
+
+  .sub-title {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(1.2rem, 4vw, 2.2rem);
+    color: rgba(255,255,255,0.7);
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  /* ─── CONFETTI ─── */
+  .confetti-piece {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    top: -20px;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  /* ─── CAKE ─── */
+  .cake-wrap {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    margin: 2rem auto;
+  }
+
+  .cake-svg { width: 100%; height: 100%; }
+
+  .candle-flame {
+    animation: flicker 0.3s ease-in-out infinite alternate;
+    transform-origin: 50% 90%;
+  }
+
+  @keyframes flicker {
+    from { transform: scaleX(1) scaleY(1); opacity: 1; }
+    to   { transform: scaleX(0.8) scaleY(1.15) skewX(5deg); opacity: 0.85; }
+  }
+
+  /* ─── MESSAGE ─── */
+  .wish-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 24px;
+    padding: 2.5rem 3rem;
+    max-width: 600px;
+    text-align: center;
+    backdrop-filter: blur(12px);
+    margin-top: 2rem;
+  }
+
+  .wish-card p {
+    font-size: 1.15rem;
+    line-height: 1.9;
+    color: rgba(255,255,255,0.82);
+    font-weight: 300;
+  }
+
+  .wish-card p em {
+    color: var(--pink);
+    font-style: normal;
+    font-weight: 500;
+  }
+
+  /* ─── POLAROID GALLERY ─── */
+  #memories-section {
+    background: linear-gradient(180deg, #0f0a1e 0%, #130d28 100%);
+    gap: 3rem;
+  }
+
+  .section-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--violet);
+    margin-bottom: 0.5rem;
+  }
+
+  .section-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 5vw, 3rem);
+    color: white;
+    text-align: center;
+  }
+
+  .polaroid-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    justify-content: center;
+    max-width: 900px;
+  }
+
+  .polaroid {
+    background: #fff;
+    padding: 12px 12px 40px;
+    width: 180px;
+    box-shadow: 4px 6px 24px rgba(0,0,0,0.6);
+    transform: rotate(var(--rot));
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: default;
+  }
+
+  .polaroid:hover {
+    transform: rotate(0deg) scale(1.08);
+    box-shadow: 6px 10px 40px rgba(0,0,0,0.8);
+    z-index: 10;
+  }
+
+  .polaroid-img {
+    width: 100%;
+    height: 140px;
+    background: var(--color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+  }
+
+  .polaroid-caption {
+    color: #333;
+    text-align: center;
+    font-size: 0.7rem;
+    font-family: 'DM Sans', sans-serif;
+    margin-top: 8px;
+    font-weight: 500;
+  }
+
+  /* ─── WISH BUTTON ─── */
+  #music-btn {
+    padding: 1rem 2.5rem;
+    border-radius: 100px;
+    border: 2px solid rgba(251,191,36,0.5);
+    background: rgba(251,191,36,0.1);
+    color: var(--gold);
+    font-size: 1rem;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+  }
+
+  #music-btn:hover {
+    background: rgba(251,191,36,0.2);
+    box-shadow: 0 0 30px rgba(251,191,36,0.3);
+    transform: scale(1.05);
+  }
+
+  /* ─── FOOTER GALAXY ─── */
+  #galaxy-section {
+    min-height: 50vh;
+    background: radial-gradient(ellipse at 50% 100%, #1a0533 0%, #0f0a1e 60%);
+    text-align: center;
+    gap: 1.5rem;
+  }
+
+  .heart-burst {
+    font-size: 4rem;
+    animation: heartbeat 1.5s ease-in-out infinite;
+  }
+
+  @keyframes heartbeat {
+    0%,100% { transform: scale(1); }
+    50%      { transform: scale(1.2); }
+  }
+
+  .footer-text {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(1.2rem, 3vw, 1.8rem);
+    color: rgba(255,255,255,0.6);
+  }
+
+  .from-name {
+    font-size: 0.85rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--pink);
+    opacity: 0.7;
+  }
+
+  /* ─── FLOATING PARTICLES ─── */
+  .float-emoji {
+    position: fixed;
+    font-size: 1.5rem;
+    pointer-events: none;
+    z-index: 2;
+    animation: floatUp linear infinite;
+    opacity: 0;
+  }
+
+  @keyframes floatUp {
+    0%   { opacity: 0;   transform: translateY(0) rotate(0deg); }
+    10%  { opacity: 0.8; }
+    90%  { opacity: 0.6; }
+    100% { opacity: 0;   transform: translateY(-100vh) rotate(360deg); }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="stars-canvas"></canvas>
+
+<!-- ══════════════ SURPRISE DOOR ══════════════ -->
+<section id="surprise-section">
+  <p class="section-label" style="margin-bottom:2rem;">A special delivery for you</p>
+  <div id="door-wrap" onclick="openDoor()">
+    <div id="door">
+      <div class="door-face door-front">
+        <div style="font-size:3rem;">🎁</div>
+        <div style="font-family:'Playfair Display',serif; font-size:1.1rem; color:rgba(255,255,255,0.9);">For You</div>
+        <div class="door-knocker"></div>
+      </div>
+      <div class="door-face door-back"></div>
+    </div>
+  </div>
+  <p id="door-hint">tap to open</p>
+</section>
+
+<!-- ══════════════ HERO ══════════════ -->
+<section id="hero-section">
+  <div class="section-label">today is your day</div>
+  <h1 class="big-title">Happy Birthday,<br>Moniii! 🎂</h1>
+  <p class="sub-title">May this year be your most magical yet</p>
+
+  <!-- SVG Cake -->
+  <div class="cake-wrap">
+    <svg class="cake-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <!-- plate shadow -->
+      <ellipse cx="100" cy="180" rx="70" ry="8" fill="rgba(0,0,0,0.3)"/>
+      <!-- bottom tier -->
+      <rect x="30" y="130" width="140" height="48" rx="8" fill="#db2777"/>
+      <rect x="30" y="130" width="140" height="14" rx="6" fill="#f472b6"/>
+      <!-- frosting drips -->
+      <path d="M30 144 Q45 155 60 144 Q75 155 90 144 Q105 155 120 144 Q135 155 150 144 Q165 155 170 144" stroke="white" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <!-- top tier -->
+      <rect x="55" y="86" width="90" height="48" rx="8" fill="#7c3aed"/>
+      <rect x="55" y="86" width="90" height="14" rx="6" fill="#a78bfa"/>
+      <!-- frosting drips top -->
+      <path d="M55 100 Q66 110 77 100 Q88 110 99 100 Q110 110 121 100 Q132 110 143 100 Q144 108 145 100" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <!-- dots decoration -->
+      <circle cx="50" cy="155" r="4" fill="#fbbf24"/>
+      <circle cx="70" cy="162" r="3" fill="white" opacity=".6"/>
+      <circle cx="150" cy="155" r="4" fill="#fbbf24"/>
+      <circle cx="130" cy="163" r="3" fill="white" opacity=".6"/>
+      <circle cx="75" cy="108" r="3" fill="#fbbf24"/>
+      <circle cx="120" cy="110" r="3" fill="white" opacity=".7"/>
+      <!-- candle 1 -->
+      <rect x="85" y="60" width="10" height="28" rx="3" fill="#fb7185"/>
+      <rect x="85" y="60" width="10" height="5" rx="2" fill="#fbbf24"/>
+      <!-- flame 1 -->
+      <g class="candle-flame">
+        <ellipse cx="90" cy="54" rx="5" ry="8" fill="#fbbf24" opacity=".9"/>
+        <ellipse cx="90" cy="56" rx="3" ry="5" fill="#fb923c" opacity=".7"/>
+      </g>
+      <!-- candle 2 -->
+      <rect x="105" y="55" width="10" height="33" rx="3" fill="#c084fc"/>
+      <rect x="105" y="55" width="10" height="5" rx="2" fill="#fbbf24"/>
+      <!-- flame 2 -->
+      <g class="candle-flame" style="animation-delay:.15s">
+        <ellipse cx="110" cy="49" rx="5" ry="8" fill="#fbbf24" opacity=".9"/>
+        <ellipse cx="110" cy="51" rx="3" ry="5" fill="#fb923c" opacity=".7"/>
+      </g>
+      <!-- stars -->
+      <text x="32" y="120" font-size="10" opacity=".5">✦</text>
+      <text x="158" y="118" font-size="10" opacity=".5">✦</text>
+      <text x="92" y="44" font-size="8" opacity=".4">✦</text>
+    </svg>
+  </div>
+
+  <div class="wish-card">
+    <p>
+      Here's to <em>you</em> — the one who lights up every room, laughs a little too loud, and makes everything better just by being there. 🌟<br/><br/>
+      Wishing you a day full of <em>joy</em>, a year full of <em>adventures</em>, and a lifetime full of <em>love</em>. You deserve every single bit of it.
+    </p>
+  </div>
+
+  <button id="music-btn" onclick="launchConfetti()">🎉 Celebrate!</button>
+</section>
+
+<!-- ══════════════ MEMORIES ══════════════ -->
+<section id="memories-section">
+  <div class="section-label">a few reasons you're amazing</div>
+  <h2 class="section-heading">Here's to You ✨</h2>
+  <div class="polaroid-grid" id="polaroids"></div>
+</section>
+
+<!-- ══════════════ GALAXY FOOTER ══════════════ -->
+<section id="galaxy-section">
+  <div class="heart-burst">💖</div>
+  <p class="footer-text">"You're a whole universe in one person."</p>
+  <p style="color:rgba(255,255,255,0.4); font-size:0.95rem; max-width:400px; text-align:center; line-height:1.7;">
+    No matter how far apart we are, know that you're celebrated, cherished, and so very loved today and always.
+  </p>
+  <p class="from-name">— with all the love 💜</p>
+</section>
+
+<script>
+// ─── Stars ───
+const canvas = document.getElementById('stars-canvas');
+const ctx = canvas.getContext('2d');
+let stars = [];
+
+function initStars() {
+  canvas.width = innerWidth;
+  canvas.height = innerHeight;
+  stars = Array.from({length: 200}, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    r: Math.random() * 1.5 + 0.3,
+    a: Math.random(),
+    speed: Math.random() * 0.005 + 0.002,
+    phase: Math.random() * Math.PI * 2
+  }));
+}
+
+function drawStars(t) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  stars.forEach(s => {
+    s.a = 0.3 + 0.7 * Math.abs(Math.sin(s.speed * t + s.phase));
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(255,255,255,${s.a})`;
+    ctx.fill();
+  });
+  requestAnimationFrame(drawStars);
+}
+
+window.addEventListener('resize', initStars);
+initStars();
+requestAnimationFrame(drawStars);
+
+// ─── Door open ───
+function openDoor() {
+  const door = document.getElementById('door');
+  if (door.classList.contains('open')) return;
+  door.classList.add('open');
+  document.getElementById('door-hint').style.opacity = '0';
+  setTimeout(() => {
+    document.getElementById('surprise-section').style.display = 'none';
+    const hero = document.getElementById('hero-section');
+    hero.classList.add('visible');
+    spawnFloaties();
+  }, 1300);
+}
+
+// ─── Polaroids ───
+const memories = [
+  { emoji: '🤣', color: '#fde68a', caption: 'your laugh — contagious' },
+  { emoji: '🌸', color: '#fbcfe8', caption: 'the kindest heart' },
+  { emoji: '🎵', color: '#c4b5fd', caption: 'dancing like nobody\'s watching' },
+  { emoji: '🌙', color: '#93c5fd', caption: 'late night chats' },
+  { emoji: '🍕', color: '#fed7aa', caption: 'food adventures' },
+  { emoji: '✨', color: '#a7f3d0', caption: 'pure magic, always' },
+];
+
+const rots = ['-3deg','2deg','-1.5deg','3deg','-2.5deg','1deg'];
+const grid = document.getElementById('polaroids');
+memories.forEach((m, i) => {
+  const div = document.createElement('div');
+  div.className = 'polaroid';
+  div.style.setProperty('--rot', rots[i]);
+  div.innerHTML = `
+    <div class="polaroid-img" style="--color:${m.color}">${m.emoji}</div>
+    <div class="polaroid-caption">${m.caption}</div>
+  `;
+  grid.appendChild(div);
+});
+
+// ─── Confetti ───
+function launchConfetti() {
+  const colors = ['#f472b6','#a78bfa','#fbbf24','#34d399','#60a5fa','#fb7185'];
+  for (let i = 0; i < 80; i++) {
+    setTimeout(() => spawnPiece(colors[Math.floor(Math.random()*colors.length)]), i * 30);
+  }
+}
+
+function spawnPiece(color) {
+  const el = document.createElement('div');
+  el.className = 'confetti-piece';
+  el.style.cssText = `
+    left: ${Math.random()*100}vw;
+    background: ${color};
+    border-radius: ${Math.random()>0.5?'50%':'2px'};
+    width: ${6+Math.random()*8}px;
+    height: ${6+Math.random()*8}px;
+    animation: confettiFall ${2+Math.random()*2}s ease-in forwards;
+    transform: rotate(${Math.random()*360}deg);
+  `;
+  document.body.appendChild(el);
+  el.addEventListener('animationend', () => el.remove());
+}
+
+// inject confetti keyframes
+const style = document.createElement('style');
+style.textContent = `@keyframes confettiFall {
+  0%   { top:-20px; opacity:1; transform: rotate(0deg) translateX(0); }
+  100% { top:110vh; opacity:0.2; transform: rotate(720deg) translateX(${(Math.random()-.5)*200}px); }
+}`;
+document.head.appendChild(style);
+
+// ─── Floating emojis ───
+function spawnFloaties() {
+  const emojis = ['🎂','🎉','🎈','💜','✨','🌟','🥳','💫'];
+  setInterval(() => {
+    const el = document.createElement('div');
+    el.className = 'float-emoji';
+    el.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    el.style.cssText = `
+      left: ${Math.random()*95}vw;
+      bottom: -50px;
+      animation-duration: ${4+Math.random()*4}s;
+      animation-delay: ${Math.random()*2}s;
+      font-size: ${1+Math.random()*1.5}rem;
+    `;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 9000);
+  }, 600);
+}
+</script>
+</body>
+</html>
