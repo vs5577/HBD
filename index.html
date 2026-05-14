@@ -326,6 +326,16 @@
     animation: floatUp linear infinite;
     opacity: 0;
   }
+.polaroid-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.polaroid-img {
+  width: 100%;
+  height: 140px;
+  overflow: hidden;
+}
 
   @keyframes floatUp {
     0%   { opacity: 0;   transform: translateY(0) rotate(0deg); }
@@ -336,6 +346,9 @@
 </style>
 </head>
 <body>
+<audio id="birthday-song" loop>
+  <source src="vaaram_bgm.mp3" type="audio/mpeg">
+</audio>
 
 <canvas id="stars-canvas"></canvas>
 
@@ -469,29 +482,62 @@ initStars();
 requestAnimationFrame(drawStars);
 
 // ─── Door open ───
+// ─── Door open ───
 function openDoor() {
+
   const door = document.getElementById('door');
+  const music = document.getElementById('birthday-song');
+
+  // stop multiple clicks
   if (door.classList.contains('open')) return;
+
+  // open animation
   door.classList.add('open');
+
+  // hide hint text
   document.getElementById('door-hint').style.opacity = '0';
+
+  // music settings
+  music.volume = 0;
+
+  // play song
+  music.play();
+
+  // smooth fade in
+  let fade = setInterval(() => {
+    if (music.volume < 0.4) {
+      music.volume += 0.02;
+    } else {
+      clearInterval(fade);
+    }
+  }, 120);
+
+  // show hero section
   setTimeout(() => {
+
     document.getElementById('surprise-section').style.display = 'none';
+
     const hero = document.getElementById('hero-section');
+
     hero.classList.add('visible');
+
+    // floating emojis
     spawnFloaties();
+
+    // automatic confetti burst
+    launchConfetti();
+
   }, 1300);
 }
-
 // ─── Polaroids ───
 const memories = [
-  { emoji: '🤣', color: '#fde68a', caption: 'your laugh — contagious' },
-  { emoji: '🌸', color: '#fbcfe8', caption: 'the kindest heart' },
-  { emoji: '🎵', color: '#c4b5fd', caption: 'dancing like nobody\'s watching' },
-  { emoji: '🌙', color: '#93c5fd', caption: 'late night chats' },
-  { emoji: '🍕', color: '#fed7aa', caption: 'food adventures' },
-  { emoji: '✨', color: '#a7f3d0', caption: 'pure magic, always' },
+  { img: 'a.jpeg', caption: 'your laugh — contagious' },
+  { img: 'b.jpeg', caption: 'the kindest heart' },
+  { img: 'c.jpeg', caption: 'dancing like nobody\'s watching' },
+  { img: 'd.jpeg', caption: 'sunshine in human form' },
+  { img: 'e.jpeg', caption: 'pure joy' },
+  { img: 'f.jpeg', caption: 'pure magic, always' },
 ];
-
 const rots = ['-3deg','2deg','-1.5deg','3deg','-2.5deg','1deg'];
 const grid = document.getElementById('polaroids');
 memories.forEach((m, i) => {
@@ -499,7 +545,9 @@ memories.forEach((m, i) => {
   div.className = 'polaroid';
   div.style.setProperty('--rot', rots[i]);
   div.innerHTML = `
-    <div class="polaroid-img" style="--color:${m.color}">${m.emoji}</div>
+    <div class="polaroid-img">
+  <img src="${m.img}" alt="memory">
+</div>
     <div class="polaroid-caption">${m.caption}</div>
   `;
   grid.appendChild(div);
